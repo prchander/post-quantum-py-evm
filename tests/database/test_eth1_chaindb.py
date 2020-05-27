@@ -217,7 +217,7 @@ def test_chaindb_get_receipt_and_tx_by_index(chain, funded_address, funded_addre
 
 
 @pytest.mark.parametrize(
-    ("use_persist_unexecuted_block"),
+    "use_persist_unexecuted_block",
     (
         True,
         pytest.param(

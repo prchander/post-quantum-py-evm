@@ -135,26 +135,26 @@ class ChainDB(HeaderDB, ChainDatabaseAPI):
                                  receipts: Tuple[ReceiptAPI, ...],
                                  genesis_parent_hash: Hash32 = GENESIS_PARENT_HASH
                                  ) -> Tuple[Tuple[Hash32, ...], Tuple[Hash32, ...]]:
+
+        tx_root_hash, tx_kv_nodes = make_trie_root_and_nodes(block.transactions)
+
+        if tx_root_hash != block.header.transaction_root:
+            raise ValidationError(
+                f"Block's transaction_root ({block.header.transaction_root}) "
+                f"does not match expected value: {tx_root_hash}"
+            )
+
+        receipt_root_hash, receipt_kv_nodes = make_trie_root_and_nodes(receipts)
+
+        if receipt_root_hash != block.header.receipt_root:
+            raise ValidationError(
+                f"Block's receipt_root ({block.header.receipt_root}) "
+                f"does not match expected value: {receipt_root_hash}"
+            )
+
         with self.db.atomic_batch() as db:
-            tx_root_hash, tx_kv_nodes = make_trie_root_and_nodes(block.transactions)
-
-            if tx_root_hash != block.header.transaction_root:
-                raise ValidationError(
-                    f"Block's transaction_root ({block.header.transaction_root}) "
-                    f"does not match expected value: {tx_root_hash}"
-                )
-
-            self._persist_trie_data_dict(db, tx_kv_nodes)
-
-            receipt_root_hash, receipt_kv_nodes = make_trie_root_and_nodes(receipts)
-
-            if receipt_root_hash != block.header.receipt_root:
-                raise ValidationError(
-                    f"Block's receipt_root ({block.header.receipt_root}) "
-                    f"does not match expected value: {receipt_root_hash}"
-                )
-
             self._persist_trie_data_dict(db, receipt_kv_nodes)
+            self._persist_trie_data_dict(db, tx_kv_nodes)
 
             return self._persist_block(db, block, genesis_parent_hash)
 

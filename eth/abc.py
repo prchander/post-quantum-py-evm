@@ -631,9 +631,10 @@ class ChainDatabaseAPI(HeaderDatabaseAPI):
             as genesis. Providing a ``genesis_parent_hash`` allows storage of blocks that
             aren't (yet) connected back to the true genesis header.
 
-        WARNING: This API assumes all block transactions have been persisted already. Use
-        :meth:`eth.abc.ChainDatabaseAPI.persist_unexecuted_block` to persist blocks that were not
-        executed.
+        .. warning::
+            This API assumes all block transactions have been persisted already. Use
+            :meth:`eth.abc.ChainDatabaseAPI.persist_unexecuted_block` to persist blocks that were
+            not executed.
         """
         ...
 
